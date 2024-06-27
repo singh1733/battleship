@@ -1,4 +1,6 @@
-const { Ship, GameBoard, Players } = require("./classes");
+import _ from 'lodash';
+import './style.css';
+import { Ship, GameBoard, Players } from "./classes";
 
 function createGame() {
   const players = new Players();
@@ -13,9 +15,9 @@ function populateBoard(board) {
   ship = new Ship(2);
   board.place(ship, [0, 6], "vertical");
   ship = new Ship(1);
-  board.place(ship, [10, 10], "vertical");
+  board.place(ship, [9, 9], "vertical");
   ship = new Ship(2);
-  board.place(ship, [9, 8], "horizontal");
+  board.place(ship, [9, 6], "horizontal");
   ship = new Ship(3);
   board.place(ship, [2, 6], "horizontal");
   ship = new Ship(1);
@@ -30,7 +32,7 @@ function loadPhysicalBoard(players) {
     for (let j = 0; j < 10; j++) {
       let square = document.createElement("div");
       square.id = "" + i + "" + j;
-      let boardSquare = players.real[i][j];
+      let boardSquare = players.real.board[i][j];
       if (boardSquare === "empty" || boardSquare === "missed") {
         square.classList.add(boardSquare);
       } else {
@@ -43,7 +45,7 @@ function loadPhysicalBoard(players) {
     for (let j = 0; j < 10; j++) {
       let square = document.createElement("div");
       square.id = "" + i + "" + j;
-      let boardSquare = players.computer[i][j];
+      let boardSquare = players.computer.board[i][j];
       if (boardSquare === "empty" || boardSquare === "missed") {
         square.classList.add(boardSquare);
       } else {

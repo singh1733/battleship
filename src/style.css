@@ -1,4 +1,23 @@
+.ship {
+  background-color: black;
+}
 
-.ship{
-    background-color: black;
+body{
+  display: flex;
+  gap:20px;
+}
+
+#computer div,
+#real div {
+  width: 10px;
+  height: 10px;
+  border: 1px black solid;
+}
+
+#computer,
+#real {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+
 }
