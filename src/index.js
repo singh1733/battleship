@@ -70,9 +70,12 @@ function processClick(square, player) {
   if (coordinateContent === "missed") {
   } else if (coordinateContent === "empty") {
     coordinateContent = "missed";
+    square.classList.add("miss");
+    square.innerHTML="<div></div>"
     switchTurn();
   } else {
     player.receiveAttack(square.id.charAt(0) - "0", square.id.charAt(1) - "0");
+    square.classList.remove("ship");
     square.classList.add("hit");
   }
 
