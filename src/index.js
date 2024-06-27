@@ -24,10 +24,10 @@ function populateBoard(board) {
   board.place(ship, [5, 3], "horizontal");
 }
 
-function loadPhysicalBoard(players) {
-  const realBoard = document.getElementById("real");
-  const compBoard = document.getElementById("computer");
+const realBoard = document.getElementById("real");
+const compBoard = document.getElementById("computer");
 
+function loadPhysicalBoard(players) {
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
       let square = document.createElement("button");
@@ -42,7 +42,7 @@ function loadPhysicalBoard(players) {
       }
       realBoard.appendChild(square);
       square.addEventListener("click", () =>
-        processClick(square, players.real.board)
+        processClick(square, players.real)
       );
     }
   }
@@ -58,22 +58,54 @@ function loadPhysicalBoard(players) {
       }
       compBoard.appendChild(square);
       square.addEventListener("click", () =>
-        processClick(square, players.computer.board)
+        processClick(square, players.computer)
       );
     }
   }
 }
 
-function processClick(square, board) {
+function processClick(square, player) {
   let coordinateContent =
-    board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"];
+    player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"];
   if (coordinateContent === "missed") {
   } else if (coordinateContent === "empty") {
     coordinateContent = "missed";
+    switchTurn();
   } else {
-    board.receiveAttack(square.id.charAt(0) - "0", square.id.charAt(1) - "0");
+    player.receiveAttack(square.id.charAt(0) - "0", square.id.charAt(1) - "0");
     square.classList.add("hit");
+  }
+
+  if (player.reportAllSunk()) {
+    winMessage();
   }
 }
 
+function switchTurn() {
+  currentPlayer = currentPlayer === "real" ? "computer" : "real";
+  if (currentPlayer === "computer") {
+    realBoard.querySelectorAll("button").forEach((node) => {
+      node.disabled = false;
+      node.style.opacity = "1";
+    });
+    compBoard.querySelectorAll("button").forEach((node) => {
+      node.disabled = true;
+      node.style.opacity = ".5";
+    });
+  } else {
+    realBoard.querySelectorAll("button").forEach((node) => {
+      node.disabled = true;
+      node.style.opacity = ".5";
+    });
+    compBoard.querySelectorAll("button").forEach((node) => {
+      node.disabled = false;
+      node.style.opacity = "1";
+    });
+  }
+}
+
+function winMessage() {}
+
 createGame();
+let currentPlayer = "computer";
+switchTurn();
