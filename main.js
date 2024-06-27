@@ -34,6 +34,12 @@ class GameBoard {
       }
     }
   }
+
+  receiveAttack(row, column) {
+    if (this.board[row][column] !== "empty") {
+      this.board[row][column].hit();
+    }
+  }
 }
 
 module.exports = { Ship, GameBoard };
