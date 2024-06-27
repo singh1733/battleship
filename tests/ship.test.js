@@ -1,4 +1,4 @@
-const { Ship } = require("../main");
+const { Ship } = require("../src/classes");
 
 test("constructor", () => {
   const ship = new Ship(4);
