@@ -36,9 +36,30 @@ class GameBoard {
   }
 
   receiveAttack(row, column) {
-    if (this.board[row][column] !== "empty") {
+    if (
+      this.board[row][column] !== "empty" &&
+      this.board[row][column] !== "missed"
+    ) {
       this.board[row][column].hit();
+    } else {
+      this.board[row][column] = "missed";
     }
+  }
+
+  reportAllSunk(){
+    for (let i = 0; i < 16; i++) {
+        for (let j = 0; j < 16; j++) {
+            if (
+                this.board[i][j] !== "empty" &&
+                this.board[i][j] !== "missed"
+              ) {
+                if (!this.board[i][j].isSunk()){
+                    return false;
+                }
+              }
+        }
+      }
+      return true;
   }
 }
 
