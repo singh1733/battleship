@@ -132,8 +132,32 @@ function computerTurn(player, real) {
   }
 }
 
-function winMessage() {}
+function winMessage() {
+  const dialog = document.createElement("dialog");
+  const para = document.createElement("p");
+  if (currentPlayer === "real") {
+    para.textContent = "You won!";
+  } else {
+    para.textContent = "Computer won.";
+  }
+  dialog.appendChild(para);
+  const button = document.createElement("button");
+  button.textContent = "close";
+  button.addEventListener("click", () => {
+    document.getElementById("computer").innerHTML = "";
+    document.getElementById("real").innerHTML = "";
+    begin();
+    dialog.open = false;
+  });
+  dialog.appendChild(button);
+  document.body.appendChild(dialog);
+  dialog.open = true;
+}
 
-createGame();
 let currentPlayer = "computer";
-switchTurn();
+function begin() {
+  createGame();
+  currentPlayer = "computer";
+  switchTurn();
+}
+begin();
