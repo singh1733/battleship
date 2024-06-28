@@ -70,8 +70,7 @@ button {
   font: inherit;
 }
 
-#real .ship,
-#computer .ship {
+#real .ship {
   background-color: black;
 }
 
