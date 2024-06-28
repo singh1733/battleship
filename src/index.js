@@ -11,18 +11,40 @@ function createGame() {
 }
 
 function populateBoard(board) {
-  let ship = new Ship(3);
-  board.place(ship, [0, 1], "horizontal");
-  ship = new Ship(2);
-  board.place(ship, [0, 6], "vertical");
-  ship = new Ship(1);
-  board.place(ship, [9, 9], "vertical");
-  ship = new Ship(2);
-  board.place(ship, [9, 6], "horizontal");
-  ship = new Ship(3);
-  board.place(ship, [2, 6], "horizontal");
-  ship = new Ship(1);
-  board.place(ship, [5, 3], "horizontal");
+  placeShip(board, 3);
+  placeShip(board, 3);
+  placeShip(board, 2);
+  placeShip(board, 2);
+  placeShip(board, 1);
+  placeShip(board, 1);
+}
+
+function placeShip(board, length) {
+  let ship = new Ship(length);
+  let row = Math.floor(Math.random() * 10);
+  let column = Math.floor(Math.random() * 10);
+  let positioning =
+    Math.floor(Math.random() * 2) === 0 ? "horizontal" : "column";
+  for (let i = 0; i < length; i++) {
+    if (positioning === "horizontal") {
+      if (column + i>=10||board.board[row][column + i] !== "empty") {
+        row = Math.floor(Math.random() * 10);
+        column = Math.floor(Math.random() * 10);
+        positioning =
+          Math.floor(Math.random() * 2) == 0 ? "horizontal" : "column";
+        i = 0;
+      }
+    } else {
+      if (row + i>=10||board.board[row + i][column] !== "empty") {
+        row = Math.floor(Math.random() * 10);
+        column = Math.floor(Math.random() * 10);
+        positioning =
+          Math.floor(Math.random() * 2) == 0 ? "horizontal" : "column";
+        i = 0;
+      }
+    }
+  }
+  board.place(ship, [row, column], positioning);
 }
 
 const realBoard = document.getElementById("real");
@@ -70,7 +92,7 @@ function processClick(square, player, real) {
     player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"];
   if (coordinateContent === "missed") {
     if (currentPlayer === "computer") {
-      setTimeout(() => computerTurn(player, real, real), 1000);
+      setTimeout(() => computerTurn(player, real, real), 500);
     }
   } else if (coordinateContent === "empty") {
     player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"] =
@@ -84,7 +106,7 @@ function processClick(square, player, real) {
     square.classList.remove("ship");
     square.classList.add("hit");
     if (currentPlayer === "computer") {
-      setTimeout(() => computerTurn(player, real, real), 1000);
+      setTimeout(() => computerTurn(player, real, real), 500);
     }
   }
 
@@ -104,7 +126,7 @@ function switchTurn(player, real) {
       node.disabled = true;
       node.style.opacity = ".5";
     });
-    setTimeout(() => computerTurn(player, real, real), 1000);
+    setTimeout(() => computerTurn(player, real, real), 500);
   } else {
     realBoard.querySelectorAll("button").forEach((node) => {
       node.disabled = true;
