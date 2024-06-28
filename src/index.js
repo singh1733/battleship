@@ -2,9 +2,10 @@ import _ from "lodash";
 import "./style.css";
 import { Ship, GameBoard, Players } from "./classes";
 
-const players = new Players();
+let players;
 
 function createGame() {
+  players = new Players();
   populateBoard(players.real);
   populateBoard(players.computer);
   loadPhysicalBoard(players);
@@ -27,7 +28,7 @@ function placeShip(board, length) {
     Math.floor(Math.random() * 2) === 0 ? "horizontal" : "column";
   for (let i = 0; i < length; i++) {
     if (positioning === "horizontal") {
-      if (column + i>=10||board.board[row][column + i] !== "empty") {
+      if (column + i >= 10 || board.board[row][column + i] !== "empty") {
         row = Math.floor(Math.random() * 10);
         column = Math.floor(Math.random() * 10);
         positioning =
@@ -35,7 +36,7 @@ function placeShip(board, length) {
         i = 0;
       }
     } else {
-      if (row + i>=10||board.board[row + i][column] !== "empty") {
+      if (row + i >= 10 || board.board[row + i][column] !== "empty") {
         row = Math.floor(Math.random() * 10);
         column = Math.floor(Math.random() * 10);
         positioning =
@@ -101,14 +102,20 @@ function processClick(square, player, real) {
     square.classList.remove("empty");
     square.innerHTML = "<div></div>";
     switchTurn(player, real);
+  } else if (coordinateContent === "hit") {
+    if (currentPlayer === "computer") {
+      setTimeout(() => computerTurn(player, real, real), 500);
+    }
   } else {
     player.receiveAttack(square.id.charAt(0) - "0", square.id.charAt(1) - "0");
     square.classList.remove("ship");
     square.classList.add("hit");
+    player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"] = "hit";
     if (currentPlayer === "computer") {
       setTimeout(() => computerTurn(player, real, real), 500);
     }
   }
+
 
   if (player.reportAllSunk()) {
     winMessage();
@@ -140,18 +147,15 @@ function switchTurn(player, real) {
 }
 
 function computerTurn(player, real) {
-  while (true) {
-    let row = Math.floor(Math.random() * 10);
-    let column = Math.floor(Math.random() * 10);
-    let square = document.getElementById("" + row + "" + column + "real");
-    if (
-      !square.classList.contains("missed") &&
-      !square.classList.contains("hit")
-    ) {
-      processClick(square, real, real);
-      return;
-    }
-  }
+  let realDiv = document.getElementById("real");
+  let realEmpties = [...realDiv.querySelectorAll(".empty")];
+  let realShips = [...realDiv.querySelectorAll(".ship")];
+  let availableSquares = [...realEmpties, ...realShips];
+  let random = Math.floor(Math.random() * availableSquares.length);
+  let row = availableSquares[random].id.charAt(0);
+  let column = availableSquares[random].id.charAt(1);
+  let square = document.getElementById("" + row + "" + column + "real");
+  processClick(square, real, real);
 }
 
 function winMessage() {

@@ -70,7 +70,8 @@ button {
   font: inherit;
 }
 
-#real .ship {
+#real .ship,
+#computer .ship {
   background-color: black;
 }
 
@@ -109,4 +110,3 @@ body {
   border-radius: 50%;
   background-color: black;
 }
-

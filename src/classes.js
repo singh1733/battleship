@@ -50,7 +50,12 @@ class GameBoard {
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
         if (this.board[i][j] !== "empty" && this.board[i][j] !== "missed") {
-          if (!this.board[i][j].isSunk()) {
+          if (
+            this.board[i][j] !== "empty" &&
+            this.board[i][j] !== "missed" &&
+            this.board[i][j] !== "hit" &&
+            !this.board[i][j].isSunk()
+          ) {
             return false;
           }
         }
