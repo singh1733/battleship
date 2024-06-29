@@ -70,7 +70,8 @@ button {
   font: inherit;
 }
 
-#real .ship {
+#real .ship,
+.ship-hover {
   background-color: black;
 }
 
@@ -110,6 +111,6 @@ body {
   background-color: black;
 }
 
-#real .empty:hover{
+#real .empty:hover {
   background-color: gray;
 }

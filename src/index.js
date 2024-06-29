@@ -13,12 +13,12 @@ function createGame() {
     populateRealBoard(players.real, players);
   }
   if (userShipCount === 6) {
-    currentPlayer = "computer";
-    switchTurn();
     populateComputerBoard(players.computer);
     document.getElementById("computer").innerHTML = "";
     document.getElementById("real").innerHTML = "";
     loadPhysicalBoard(players);
+    currentPlayer = "computer";
+    switchTurn();
   }
 }
 
@@ -173,6 +173,14 @@ function computerTurn(player, real) {
 }
 
 function winMessage() {
+  realBoard.querySelectorAll("button").forEach((node) => {
+    node.disabled = true;
+    node.style.opacity = "1";
+  });
+  compBoard.querySelectorAll("button").forEach((node) => {
+    node.disabled = true;
+    node.style.opacity = ".5";
+  });
   const dialog = document.createElement("dialog");
   const para = document.createElement("p");
   if (currentPlayer === "real") {
@@ -186,6 +194,7 @@ function winMessage() {
   button.addEventListener("click", () => {
     document.getElementById("computer").innerHTML = "";
     document.getElementById("real").innerHTML = "";
+    userShipCount = 0;
     begin();
     dialog.open = false;
   });
@@ -195,14 +204,23 @@ function winMessage() {
 }
 function populateRealBoard(board, players) {
   let gridSquares = document.querySelectorAll("#real .empty");
+  let positionButton = document.createElement("button");
+  positionButton.textContent = "Vertical";
+  positionButton.addEventListener("click", () => {
+    positionButton.textContent =
+    positionButton.textContent === "Vertical" ? "Horizontal" : "Vertical";
+  });
+  document.body.appendChild(positionButton)
   gridSquares.forEach((element) => {
     element.addEventListener("click", () => {
-      let ship = new Ship(2);
-      let positioning = "horizontal";
+      let length = Math.ceil(currentShipLength);
+      currentShipLength -= 0.5;
+      let ship = new Ship(length);
+      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
       let carryOn = true;
       let row = parseInt(element.id.charAt(0));
       let column = parseInt(element.id.charAt(1));
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < length; i++) {
         if (positioning === "horizontal") {
           if (column + i >= 10 || board.board[row][column + i] !== "empty") {
             carryOn = false;
@@ -218,10 +236,10 @@ function populateRealBoard(board, players) {
         board.place(
           ship,
           [parseInt(element.id.charAt(0)), parseInt(element.id.charAt(1))],
-          "horizontal"
+          positioning
         );
         userShipCount++;
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < length; i++) {
           if (positioning === "horizontal") {
             let current = document.getElementById(
               "" +
@@ -246,14 +264,128 @@ function populateRealBoard(board, players) {
         }
       }
       if (userShipCount === 6) {
-        document.getElementById("computer").innerHTML = "";
-        document.getElementById("real").innerHTML = "";
         createGame();
+      }
+    });
+    element.addEventListener("mouseout", () => {
+      let length = Math.floor(currentShipLength + 0.5);
+      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
+      let carryOn = true;
+      for (let i = 0; i < length; i++) {
+        if (positioning === "horizontal") {
+          if (
+            parseInt(element.id.charAt(1)) + i >= 10 ||
+            board.board[parseInt(element.id.charAt(0))][
+              parseInt(element.id.charAt(1)) + i
+            ] !== "empty"
+          ) {
+            carryOn = false;
+            break;
+          }
+        } else {
+          if (
+            parseInt(element.id.charAt(0)) + i >= 10 ||
+            board.board[parseInt(element.id.charAt(0)) + i][
+              parseInt(element.id.charAt(1))
+            ] !== "empty"
+          ) {
+            carryOn = false;
+            break;
+          }
+        }
+      }
+      if (carryOn) {
+        for (let i = 0; i < length; i++) {
+          if (positioning === "horizontal") {
+            let current = document.getElementById(
+              "" +
+                parseInt(element.id.charAt(0)) +
+                "" +
+                (parseInt(element.id.charAt(1)) + i) +
+                "real"
+            );
+            if (current.classList.contains("ship-hover")) {
+              current.classList.remove("ship-hover");
+            }
+            current.classList.add("empty");
+          } else {
+            let current = document.getElementById(
+              "" +
+                (parseInt(element.id.charAt(0)) + i) +
+                "" +
+                parseInt(element.id.charAt(1)) +
+                "real"
+            );
+            if (current.classList.contains("ship-hover")) {
+              current.classList.remove("ship-hover");
+            }
+            current.classList.add("empty");
+          }
+        }
+      }
+    });
+    element.addEventListener("mouseover", () => {
+      let length = Math.floor(currentShipLength + 0.5);
+      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
+      let carryOn = true;
+
+      for (let i = 0; i < length; i++) {
+        if (positioning === "horizontal") {
+          if (
+            parseInt(element.id.charAt(1)) + i >= 10 ||
+            board.board[parseInt(element.id.charAt(0))][
+              parseInt(element.id.charAt(1)) + i
+            ] !== "empty"
+          ) {
+            carryOn = false;
+            break;
+          }
+        } else {
+          if (
+            parseInt(element.id.charAt(0)) + i >= 10 ||
+            board.board[parseInt(element.id.charAt(0)) + i][
+              parseInt(element.id.charAt(1))
+            ] !== "empty"
+          ) {
+            carryOn = false;
+            break;
+          }
+        }
+      }
+
+      if (carryOn) {
+        for (let i = 0; i < length; i++) {
+          if (positioning === "horizontal") {
+            let current = document.getElementById(
+              "" +
+                parseInt(element.id.charAt(0)) +
+                "" +
+                (parseInt(element.id.charAt(1)) + i) +
+                "real"
+            );
+            if (current) {
+              current.classList.remove("empty");
+              current.classList.add("ship-hover");
+            }
+          } else {
+            let current = document.getElementById(
+              "" +
+                (parseInt(element.id.charAt(0)) + i) +
+                "" +
+                parseInt(element.id.charAt(1)) +
+                "real"
+            );
+            if (current) {
+              current.classList.remove("empty");
+              current.classList.add("ship-hover");
+            }
+          }
+        }
       }
     });
   });
 }
-
+let currentShipLength = 3;
 let currentPlayer = "computer";
 function begin() {
   createGame();
