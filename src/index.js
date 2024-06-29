@@ -4,23 +4,34 @@ import { Ship, GameBoard, Players } from "./classes";
 
 let players;
 
+let userShipCount = 0;
+
 function createGame() {
-  players = new Players();
-  populateBoard(players.real);
-  populateBoard(players.computer);
-  loadPhysicalBoard(players);
+  if (userShipCount === 0) {
+    players = new Players();
+    loadPhysicalBoard(players);
+    populateRealBoard(players.real, players);
+  }
+  if (userShipCount === 6) {
+    currentPlayer = "computer";
+    switchTurn();
+    populateComputerBoard(players.computer);
+    document.getElementById("computer").innerHTML = "";
+    document.getElementById("real").innerHTML = "";
+    loadPhysicalBoard(players);
+  }
 }
 
-function populateBoard(board) {
-  placeShip(board, 3);
-  placeShip(board, 3);
-  placeShip(board, 2);
-  placeShip(board, 2);
-  placeShip(board, 1);
-  placeShip(board, 1);
+function populateComputerBoard(board) {
+  placeCompShip(board, 3);
+  placeCompShip(board, 3);
+  placeCompShip(board, 2);
+  placeCompShip(board, 2);
+  placeCompShip(board, 1);
+  placeCompShip(board, 1);
 }
 
-function placeShip(board, length) {
+function placeCompShip(board, length) {
   let ship = new Ship(length);
   let row = Math.floor(Math.random() * 10);
   let column = Math.floor(Math.random() * 10);
@@ -65,9 +76,11 @@ function loadPhysicalBoard(players) {
         square.classList.add("ship");
       }
       realBoard.appendChild(square);
-      square.addEventListener("click", () =>
-        processClick(square, players.real, players.real)
-      );
+      if (userShipCount === 6) {
+        square.addEventListener("click", () =>
+          processClick(square, players.real, players.real)
+        );
+      }
     }
   }
   for (let i = 0; i < 10; i++) {
@@ -81,9 +94,11 @@ function loadPhysicalBoard(players) {
         square.classList.add("ship");
       }
       compBoard.appendChild(square);
-      square.addEventListener("click", () =>
-        processClick(square, players.computer, players.real)
-      );
+      if (userShipCount === 6) {
+        square.addEventListener("click", () =>
+          processClick(square, players.computer, players.real)
+        );
+      }
     }
   }
 }
@@ -115,7 +130,6 @@ function processClick(square, player, real) {
       setTimeout(() => computerTurn(player, real, real), 500);
     }
   }
-
 
   if (player.reportAllSunk()) {
     winMessage();
@@ -179,11 +193,69 @@ function winMessage() {
   document.body.appendChild(dialog);
   dialog.open = true;
 }
+function populateRealBoard(board, players) {
+  let gridSquares = document.querySelectorAll("#real .empty");
+  gridSquares.forEach((element) => {
+    element.addEventListener("click", () => {
+      let ship = new Ship(2);
+      let positioning = "horizontal";
+      let carryOn = true;
+      let row = parseInt(element.id.charAt(0));
+      let column = parseInt(element.id.charAt(1));
+      for (let i = 0; i < 2; i++) {
+        if (positioning === "horizontal") {
+          if (column + i >= 10 || board.board[row][column + i] !== "empty") {
+            carryOn = false;
+          }
+        } else {
+          if (row + i >= 10 || board.board[row + i][column] !== "empty") {
+            carryOn = false;
+          }
+        }
+      }
+
+      if (carryOn) {
+        board.place(
+          ship,
+          [parseInt(element.id.charAt(0)), parseInt(element.id.charAt(1))],
+          "horizontal"
+        );
+        userShipCount++;
+        for (let i = 0; i < 2; i++) {
+          if (positioning === "horizontal") {
+            let current = document.getElementById(
+              "" +
+                parseInt(element.id.charAt(0)) +
+                "" +
+                (parseInt(element.id.charAt(1)) + i) +
+                "real"
+            );
+            current.classList.remove("empty");
+            current.classList.add("ship");
+          } else {
+            let current = document.getElementById(
+              "" +
+                (parseInt(element.id.charAt(0)) + i) +
+                "" +
+                parseInt(element.id.charAt(1)) +
+                "real"
+            );
+            current.classList.remove("empty");
+            current.classList.add("ship");
+          }
+        }
+      }
+      if (userShipCount === 6) {
+        document.getElementById("computer").innerHTML = "";
+        document.getElementById("real").innerHTML = "";
+        createGame();
+      }
+    });
+  });
+}
 
 let currentPlayer = "computer";
 function begin() {
   createGame();
-  currentPlayer = "computer";
-  switchTurn();
 }
 begin();
