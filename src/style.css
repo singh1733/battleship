@@ -71,13 +71,11 @@ button {
 }
 
 @font-face {
-  font-family: 'Press Start 2P';
-  src: url("./PressStart2P-Regular.ttf") format('truetype');;
+  font-family: "Press Start 2P";
+  src: url("./PressStart2P-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
-
-
 
 body {
   font-family: "Press Start 2P", system-ui;
@@ -119,8 +117,10 @@ body {
   border: 2px #56e39f solid;
 }
 
-#real .hit {
-  background-color: #EF6F6C;
+#real .hit,
+#computer .hit:hover,
+#computer .hit {
+  background-color: #ef6f6c;
 }
 
 .miss {
@@ -133,24 +133,35 @@ body {
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  background-color: #5B6C5D;
+  background-color: #5b6c5d;
 }
 
-#real .empty:hover {
+#computer button:hover {
   background-color: gray;
 }
 
 #real .ship,
 #real .ship-hover {
-  background-color: #5B6C5D;
+  background-color: #5b6c5d;
 }
 
 #position {
   background-color: #59c9a5;
   border: 2px #56e39f solid;
   padding: 5px 25px;
-  color: #5B6C5D;
+  color: #5b6c5d;
   font-size: 20px;
   border-radius: 10px;
   font-weight: bold;
+}
+
+dialog{
+  background-color: #59c9a5;
+  border: 2px #56e39f solid;
+  color: #5b6c5d;
+  font-size: 40px;
+  border-radius: 10px;
+  font-weight: bold;
+  justify-self: center;
+  align-self: center;
 }

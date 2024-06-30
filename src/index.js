@@ -4,16 +4,18 @@ import { Ship, GameBoard, Players } from "./classes";
 
 let players;
 
-let userShipCount = 0;
-
 function createGame() {
+  //when there are 0 ships on real board
   if (userShipCount === 0) {
     players = new Players();
     loadPhysicalBoard(players);
     populateRealBoard(players.real, players);
   }
+  //when there are 6 ships on real board, start game
   if (userShipCount === 6) {
-    document.getElementById("game-container").removeChild(document.getElementById("position"));
+    document
+      .getElementById("game-container")
+      .removeChild(document.getElementById("position"));
     populateComputerBoard(players.computer);
     document.getElementById("computer").innerHTML = "";
     document.getElementById("real").innerHTML = "";
@@ -32,27 +34,27 @@ function populateComputerBoard(board) {
   placeCompShip(board, 1);
 }
 
-function placeCompShip(board, length) {
-  let ship = new Ship(length);
+function computerShipData() {
   let row = Math.floor(Math.random() * 10);
   let column = Math.floor(Math.random() * 10);
   let positioning =
-    Math.floor(Math.random() * 2) === 0 ? "horizontal" : "column";
+    Math.floor(Math.random() * 2) == 0 ? "horizontal" : "column";
+  return { row, column, positioning };
+}
+
+function placeCompShip(board, length) {
+  let ship = new Ship(length);
+  let { row, column, positioning } = computerShipData();
+  //check for any overlap
   for (let i = 0; i < length; i++) {
     if (positioning === "horizontal") {
       if (column + i >= 10 || board.board[row][column + i] !== "empty") {
-        row = Math.floor(Math.random() * 10);
-        column = Math.floor(Math.random() * 10);
-        positioning =
-          Math.floor(Math.random() * 2) == 0 ? "horizontal" : "column";
+        ({ row, column, positioning } = computerShipData());
         i = 0;
       }
     } else {
       if (row + i >= 10 || board.board[row + i][column] !== "empty") {
-        row = Math.floor(Math.random() * 10);
-        column = Math.floor(Math.random() * 10);
-        positioning =
-          Math.floor(Math.random() * 2) == 0 ? "horizontal" : "column";
+        ({ row, column, positioning } = computerShipData());
         i = 0;
       }
     }
@@ -77,11 +79,6 @@ function loadPhysicalBoard(players) {
         square.classList.add("ship");
       }
       realBoard.appendChild(square);
-      if (userShipCount === 6) {
-        square.addEventListener("click", () =>
-          processClick(square, players.real, players.real)
-        );
-      }
     }
   }
   for (let i = 0; i < 10; i++) {
@@ -95,6 +92,7 @@ function loadPhysicalBoard(players) {
         square.classList.add("ship");
       }
       compBoard.appendChild(square);
+      //if the user board has 6 ships, allow for the buttons to be functional
       if (userShipCount === 6) {
         square.addEventListener("click", () =>
           processClick(square, players.computer, players.real)
@@ -106,27 +104,34 @@ function loadPhysicalBoard(players) {
 
 function processClick(square, player, real) {
   let coordinateContent =
-    player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"];
+    player.board[parseInt(square.id.charAt(0))][parseInt(square.id.charAt(1))];
   if (coordinateContent === "missed") {
+    //allow replay
     if (currentPlayer === "computer") {
       setTimeout(() => computerTurn(player, real, real), 500);
     }
   } else if (coordinateContent === "empty") {
-    player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"] =
+    player.board[parseInt(square.id.charAt(0))][parseInt(square.id.charAt(1))] =
       "missed";
     square.classList.add("miss");
     square.classList.remove("empty");
     square.innerHTML = "<div></div>";
     switchTurn(player, real);
   } else if (coordinateContent === "hit") {
+    //allow replay
     if (currentPlayer === "computer") {
       setTimeout(() => computerTurn(player, real, real), 500);
     }
   } else {
-    player.receiveAttack(square.id.charAt(0) - "0", square.id.charAt(1) - "0");
+    //allow replay
+    player.receiveAttack(
+      parseInt(square.id.charAt(0)),
+      parseInt(square.id.charAt(1))
+    );
     square.classList.remove("ship");
     square.classList.add("hit");
-    player.board[square.id.charAt(0) - "0"][square.id.charAt(1) - "0"] = "hit";
+    player.board[parseInt(square.id.charAt(0))][parseInt(square.id.charAt(1))] =
+      "hit";
     if (currentPlayer === "computer") {
       setTimeout(() => computerTurn(player, real, real), 500);
     }
@@ -197,70 +202,67 @@ function winMessage() {
     document.getElementById("real").innerHTML = "";
     userShipCount = 0;
     begin();
-    dialog.open = false;
+    dialog.close();
   });
   dialog.appendChild(button);
-  document.body.appendChild(dialog);
-  dialog.open = true;
+  document.getElementById("game-container").appendChild(dialog);
+  dialog.showModal();
 }
-function populateRealBoard(board, players) {
-  let gridSquares = document.querySelectorAll("#real .empty");
-  let positionButton = document.createElement("button");
-  positionButton.id="position"
-  positionButton.textContent = "Vertical";
-  positionButton.addEventListener("click", () => {
-    positionButton.textContent =
-      positionButton.textContent === "Vertical" ? "Horizontal" : "Vertical";
-  });
-  document.getElementById("game-container").appendChild(positionButton);
-  gridSquares.forEach((element) => {
+
+let userShipCount = 0;
+
+function createPositionButton() {
+    let positionButton = document.createElement("button");
+    positionButton.id = "position";
+    positionButton.textContent = "Vertical";
+    positionButton.addEventListener("click", () => {
+      positionButton.textContent =
+        positionButton.textContent === "Vertical" ? "Horizontal" : "Vertical";
+    });
+    document.getElementById("game-container").appendChild(positionButton);
+    return positionButton;
+  }
+  
+  function isPlacementValid(board, row, column, length, positioning) {
+    for (let i = 0; i < length; i++) {
+      if (positioning === "horizontal") {
+        if (column + i >= 10 || board.board[row][column + i] !== "empty") {
+          return false;
+        }
+      } else {
+        if (row + i >= 10 || board.board[row + i][column] !== "empty") {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  function handleGridSquareClick(board, element, positionButton) {
     element.addEventListener("click", () => {
       let length = Math.ceil(currentShipLength);
-      currentShipLength -= 0.5;
       let ship = new Ship(length);
       let positioning =
         positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
-      let carryOn = true;
       let row = parseInt(element.id.charAt(0));
       let column = parseInt(element.id.charAt(1));
-      for (let i = 0; i < length; i++) {
-        if (positioning === "horizontal") {
-          if (column + i >= 10 || board.board[row][column + i] !== "empty") {
-            carryOn = false;
-          }
-        } else {
-          if (row + i >= 10 || board.board[row + i][column] !== "empty") {
-            carryOn = false;
-          }
-        }
-      }
-
-      if (carryOn) {
-        board.place(
-          ship,
-          [parseInt(element.id.charAt(0)), parseInt(element.id.charAt(1))],
-          positioning
-        );
+  
+      if (isPlacementValid(board, row, column, length, positioning)) {
+        currentShipLength -= 0.5;
+        board.place(ship, [row, column], positioning);
         userShipCount++;
         for (let i = 0; i < length; i++) {
+          let current;
           if (positioning === "horizontal") {
-            let current = document.getElementById(
-              "" +
-                parseInt(element.id.charAt(0)) +
-                "" +
-                (parseInt(element.id.charAt(1)) + i) +
-                "real"
+            current = document.getElementById(
+              `${row}${column + i}real`
             );
-            current.classList.remove("empty");
-            current.classList.add("ship");
           } else {
-            let current = document.getElementById(
-              "" +
-                (parseInt(element.id.charAt(0)) + i) +
-                "" +
-                parseInt(element.id.charAt(1)) +
-                "real"
+            current = document.getElementById(
+              `${row + i}${column}real`
             );
+          }
+          if (current) {
             current.classList.remove("empty");
             current.classList.add("ship");
           }
@@ -270,126 +272,78 @@ function populateRealBoard(board, players) {
         createGame();
       }
     });
-    element.addEventListener("mouseout", () => {
-      let length = Math.floor(currentShipLength + 0.5);
-      let positioning =
-        positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
-      let carryOn = true;
-      for (let i = 0; i < length; i++) {
-        if (positioning === "horizontal") {
-          if (
-            parseInt(element.id.charAt(1)) + i >= 10 ||
-            board.board[parseInt(element.id.charAt(0))][
-              parseInt(element.id.charAt(1)) + i
-            ] !== "empty"
-          ) {
-            carryOn = false;
-            break;
-          }
-        } else {
-          if (
-            parseInt(element.id.charAt(0)) + i >= 10 ||
-            board.board[parseInt(element.id.charAt(0)) + i][
-              parseInt(element.id.charAt(1))
-            ] !== "empty"
-          ) {
-            carryOn = false;
-            break;
-          }
-        }
-      }
-      if (carryOn) {
-        for (let i = 0; i < length; i++) {
-          if (positioning === "horizontal") {
-            let current = document.getElementById(
-              "" +
-                parseInt(element.id.charAt(0)) +
-                "" +
-                (parseInt(element.id.charAt(1)) + i) +
-                "real"
-            );
-            if (current.classList.contains("ship-hover")) {
-              current.classList.remove("ship-hover");
-            }
-            current.classList.add("empty");
-          } else {
-            let current = document.getElementById(
-              "" +
-                (parseInt(element.id.charAt(0)) + i) +
-                "" +
-                parseInt(element.id.charAt(1)) +
-                "real"
-            );
-            if (current.classList.contains("ship-hover")) {
-              current.classList.remove("ship-hover");
-            }
-            current.classList.add("empty");
-          }
-        }
-      }
-    });
+  }
+  
+  function handleGridSquareMouseover(board, element, positionButton) {
     element.addEventListener("mouseover", () => {
       let length = Math.floor(currentShipLength + 0.5);
       let positioning =
         positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
-      let carryOn = true;
-
-      for (let i = 0; i < length; i++) {
-        if (positioning === "horizontal") {
-          if (
-            parseInt(element.id.charAt(1)) + i >= 10 ||
-            board.board[parseInt(element.id.charAt(0))][
-              parseInt(element.id.charAt(1)) + i
-            ] !== "empty"
-          ) {
-            carryOn = false;
-            break;
-          }
-        } else {
-          if (
-            parseInt(element.id.charAt(0)) + i >= 10 ||
-            board.board[parseInt(element.id.charAt(0)) + i][
-              parseInt(element.id.charAt(1))
-            ] !== "empty"
-          ) {
-            carryOn = false;
-            break;
-          }
-        }
-      }
-
-      if (carryOn) {
+      let row = parseInt(element.id.charAt(0));
+      let column = parseInt(element.id.charAt(1));
+  
+      if (isPlacementValid(board, row, column, length, positioning)) {
         for (let i = 0; i < length; i++) {
+          let current;
           if (positioning === "horizontal") {
-            let current = document.getElementById(
-              "" +
-                parseInt(element.id.charAt(0)) +
-                "" +
-                (parseInt(element.id.charAt(1)) + i) +
-                "real"
+            current = document.getElementById(
+              `${row}${column + i}real`
             );
-            if (current) {
-              current.classList.remove("empty");
-              current.classList.add("ship-hover");
-            }
           } else {
-            let current = document.getElementById(
-              "" +
-                (parseInt(element.id.charAt(0)) + i) +
-                "" +
-                parseInt(element.id.charAt(1)) +
-                "real"
+            current = document.getElementById(
+              `${row + i}${column}real`
             );
-            if (current) {
-              current.classList.remove("empty");
-              current.classList.add("ship-hover");
-            }
+          }
+          if (current) {
+            current.classList.remove("empty");
+            current.classList.add("ship-hover");
           }
         }
       }
     });
-  });
-}
+  }
+  
+  function handleGridSquareMouseout(board, element, positionButton) {
+    element.addEventListener("mouseout", () => {
+      let length = Math.floor(currentShipLength + 0.5);
+      let positioning =
+        positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
+      let row = parseInt(element.id.charAt(0));
+      let column = parseInt(element.id.charAt(1));
+  
+      if (isPlacementValid(board, row, column, length, positioning)) {
+        for (let i = 0; i < length; i++) {
+          let current;
+          if (positioning === "horizontal") {
+            current = document.getElementById(
+              `${row}${column + i}real`
+            );
+          } else {
+            current = document.getElementById(
+              `${row + i}${column}real`
+            );
+          }
+          if (current) {
+            if (current.classList.contains("ship-hover")) {
+              current.classList.remove("ship-hover");
+            }
+            current.classList.add("empty");
+          }
+        }
+      }
+    });
+  }
+  
+  function populateRealBoard(board, players) {
+    let gridSquares = document.querySelectorAll("#real .empty");
+    let positionButton = createPositionButton();
+  
+    gridSquares.forEach((element) => {
+      handleGridSquareClick(board, element, positionButton);
+      handleGridSquareMouseover(board, element, positionButton);
+      handleGridSquareMouseout(board, element, positionButton);
+    });
+  }  
 let currentShipLength = 3;
 let currentPlayer = "computer";
 function begin() {
