@@ -13,6 +13,7 @@ function createGame() {
     populateRealBoard(players.real, players);
   }
   if (userShipCount === 6) {
+    document.getElementById("game-container").removeChild(document.getElementById("position"));
     populateComputerBoard(players.computer);
     document.getElementById("computer").innerHTML = "";
     document.getElementById("real").innerHTML = "";
@@ -205,18 +206,20 @@ function winMessage() {
 function populateRealBoard(board, players) {
   let gridSquares = document.querySelectorAll("#real .empty");
   let positionButton = document.createElement("button");
+  positionButton.id="position"
   positionButton.textContent = "Vertical";
   positionButton.addEventListener("click", () => {
     positionButton.textContent =
-    positionButton.textContent === "Vertical" ? "Horizontal" : "Vertical";
+      positionButton.textContent === "Vertical" ? "Horizontal" : "Vertical";
   });
-  document.body.appendChild(positionButton)
+  document.getElementById("game-container").appendChild(positionButton);
   gridSquares.forEach((element) => {
     element.addEventListener("click", () => {
       let length = Math.ceil(currentShipLength);
       currentShipLength -= 0.5;
       let ship = new Ship(length);
-      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
+      let positioning =
+        positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
       let carryOn = true;
       let row = parseInt(element.id.charAt(0));
       let column = parseInt(element.id.charAt(1));
@@ -269,7 +272,8 @@ function populateRealBoard(board, players) {
     });
     element.addEventListener("mouseout", () => {
       let length = Math.floor(currentShipLength + 0.5);
-      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
+      let positioning =
+        positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
       let carryOn = true;
       for (let i = 0; i < length; i++) {
         if (positioning === "horizontal") {
@@ -326,7 +330,8 @@ function populateRealBoard(board, players) {
     });
     element.addEventListener("mouseover", () => {
       let length = Math.floor(currentShipLength + 0.5);
-      let positioning = positionButton.textContent === "Vertical" ? "horizontal" : "vertical";;
+      let positioning =
+        positionButton.textContent === "Vertical" ? "horizontal" : "vertical";
       let carryOn = true;
 
       for (let i = 0; i < length; i++) {

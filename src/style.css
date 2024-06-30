@@ -70,21 +70,45 @@ button {
   font: inherit;
 }
 
-#real .ship,
-.ship-hover {
-  background-color: black;
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url("./PressStart2P-Regular.ttf") format('truetype');;
+  font-weight: normal;
+  font-style: normal;
 }
 
+
+
 body {
+  font-family: "Press Start 2P", system-ui;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #5b6c5d;
+}
+
+#game-container {
   display: flex;
   gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+#title {
+  font-size: 60px;
+  color: #56e39f;
 }
 
 #computer button,
 #real button {
   width: 50px;
   height: 50px;
-  border: 1px black solid;
+  border: 2px #56e39f solid;
+  background-color: #59c9a5;
 }
 
 #computer,
@@ -92,10 +116,11 @@ body {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
+  border: 2px #56e39f solid;
 }
 
-.hit {
-  background-color: red;
+#real .hit {
+  background-color: #EF6F6C;
 }
 
 .miss {
@@ -108,9 +133,24 @@ body {
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  background-color: black;
+  background-color: #5B6C5D;
 }
 
 #real .empty:hover {
   background-color: gray;
+}
+
+#real .ship,
+#real .ship-hover {
+  background-color: #5B6C5D;
+}
+
+#position {
+  background-color: #59c9a5;
+  border: 2px #56e39f solid;
+  padding: 5px 25px;
+  color: #5B6C5D;
+  font-size: 20px;
+  border-radius: 10px;
+  font-weight: bold;
 }
