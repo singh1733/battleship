@@ -1,1 +1,5 @@
-# battleship
+# Battleship
+
+In this project, I implemented the classic game of Battleship using JavaScript, using some Test Driven Development (TDD) principles. The game includes multiple classes, such as Ship, GameBoard, and Players, which handle the game's core functionalities, including ship placement, attack mechanics, and game state management. Ships can be placed on the game board either vertically or horizontally, and each ship tracks the number of hits it receives until it is sunk. Players take turns attacking each other’s boards, with the computer making random, but legal, moves.
+
+The game progresses with event-driven interactions, where players click on grid squares to attack, and the game state updates dynamically based on these interactions. The User Interface is managed through DOM manipulation, rendering the state of each player’s board and updating the visuals in response to player actions. The game ends when all of one player's ships have been sunk, displaying a victory message. This project reinforced the importance of structuring code in a modular way, testing core functionality independently from the UI, and creating a seamless user experience through clear, event-driven programming.
